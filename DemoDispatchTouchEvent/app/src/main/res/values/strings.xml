@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DemoDispatchTouchEvent</string>
+    <string name="btn_h1_name">外部拦截</string>
+    <string name="btn_h2_name">内部拦截</string>
 </resources>
