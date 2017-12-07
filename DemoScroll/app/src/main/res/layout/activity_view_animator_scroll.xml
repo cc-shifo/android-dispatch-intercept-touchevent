@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.demoscroll.ViewAnimatorScrollActivity">
+
+    <!-- 使用视图动画来实现滑动效果 -->
+    <Button
+        android:id="@+id/btn_view_animator"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="@string/view_animator_scroll"
+        android:onClick="onClick"
+        />
+</LinearLayout>

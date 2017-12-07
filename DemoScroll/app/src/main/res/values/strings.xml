@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DemoScroll</string>
+    <string name="layout_parameter_scroll">LayoutScroll</string>
+    <string name="property_animator_scroll">PropertyAnimateScroll</string>
+    <string name="view_animator_scroll">ViewAnimateScroll</string>
+    <string name="delayed_scroll">Delayed scroll</string>
+    <string name="customized_btn">我可以滑动</string>
+
+</resources>
