@@ -11,7 +11,7 @@
         android:id="@+id/btn_property_animator_scroll"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:text="@string/property_animator_scroll"
+        android:text="@string/property_animator_scrollTo"
         android:onClick="onClick"
         />
 
@@ -20,7 +20,7 @@
         android:id="@+id/btn_property_animator"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:text="@string/property_animator_scroll"
+        android:text="@string/property_value_animator_scroll"
         android:onClick="onClick"
         />
 
@@ -28,7 +28,7 @@
         android:id="@+id/btn_property_object_animator"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:text="object_animator"
+        android:text="@string/property_object_animator_scroll"
         android:onClick="onClick"
         />
 </LinearLayout>

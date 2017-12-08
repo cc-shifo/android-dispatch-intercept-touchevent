@@ -78,17 +78,17 @@ public class HoriScrollViewGroup extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int childCount = getChildCount();
-        int childWidth = getChildAt(0).getMeasuredWidth();
-        mChildrenSize = childCount;
-        mChildWidth = childWidth;
+        //int childCount = getChildCount();
+        //int childWidth = getChildAt(0).getMeasuredWidth();
+        mChildrenSize = getChildCount();
+        mChildWidth = getChildAt(0).getMeasuredWidth();
         int left = 0;
 
-        for (int i = 0; i < childCount; i++) {
+        for (int i = 0; i < mChildrenSize; i++) {
             View childView = getChildAt(i);
             if (childView.getVisibility() != View.GONE) {
-                childView.layout(left, 0, childWidth+left, childView.getMeasuredHeight());
-                left += childWidth;
+                childView.layout(left, 0, mChildWidth+left, childView.getMeasuredHeight());
+                left += mChildWidth;
             }
         }
     }
@@ -103,21 +103,26 @@ public class HoriScrollViewGroup extends ViewGroup {
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         boolean intercepted = false;
         int x = (int)ev.getX();
-        int y = (int)ev.getRawY();
+        int y = (int)ev.getY();
 
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                mLastInterceptedX = 0;
+                mLastInterceptedY = 0;
+                Log.d(TAG, "onInterceptTouchEvent: ACTION_DOWN");
                 break;
             case MotionEvent.ACTION_MOVE:
-                int deltaX = y - mLastX;
-                int deltaY = y -mLastY;
+                int deltaX = x - mLastInterceptedX;
+                int deltaY = y -mLastInterceptedY;
                 if (Math.abs(deltaX) > Math.abs(deltaY)) {
                     intercepted = true;
                 }
+                Log.d(TAG, "onInterceptTouchEvent: ACTION_MOVE");
                 break;
             case MotionEvent.ACTION_UP:
                 break;
             default:
+                Log.d(TAG, "onInterceptTouchEvent: default");
                 break;
         }
 
@@ -135,14 +140,30 @@ public class HoriScrollViewGroup extends ViewGroup {
         int y = (int)event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                mLastX = 0;
+                mLastY = 0;
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
+                Log.d(TAG, "onTouchEvent: ACTION_DOWN");
                 break;
             case MotionEvent.ACTION_MOVE:
                 int deltaX = x - mLastX;
                 int deltaY = y - mLastY;
-                scrollBy(-deltaX, 0);
+                // 这个为了改变内容位置，然后重新绘制view，内容位置又归位，两个现象叠加下来就出现Spring
+                // 弹性效果。从左向后mScrollX为负，从上往下mScrollY位负。看getScrollX()注释
+                // 得知mScroll表示view显示的左边缘部分，即理解成从view的左边源向它的左边的值。
+                // mScrollX正负以及scrollTo只能改变视图的内容，参考
+                // http://blog.csdn.net/xiaanming/article/details/17483273
+                //int tmp_x = deltaX > 0 ? -4 : 4;
+                if (mChildIndex == 0 && deltaX > 0)
+                    scrollBy(-deltaX, 0);
+                    //scrollBy(tmp_x, 0);
+                else if (mChildIndex == mChildrenSize - 1 && deltaX < 0)
+                    scrollBy(-deltaX, 0);
+                    //scrollBy(tmp_x, 0);
+                //scrollBy(-deltaX, 0);
+                Log.d(TAG, "onTouchEvent: ACTION_MOVE x, mLastX, deltaX" + x + mLastX + deltaX);
                 break;
             case MotionEvent.ACTION_UP:
                 int scrollX = getScrollX();
@@ -162,8 +183,12 @@ public class HoriScrollViewGroup extends ViewGroup {
                 // 再进行一次max运算就可以计算出避免越过最低有效索引0的情况。
                 mChildIndex = Math.max(0, Math.min(mChildIndex, mChildrenSize-1));
                 int dx = (mChildIndex * mChildWidth) - scrollX;
+                smoothScrollBy(dx, 0);
+                mVelocityTracker.clear();
+                Log.d(TAG, "onTouchEvent: ACTION_UP");
                 break;
             default:
+                Log.d(TAG, "onTouchEvent: default");
                 break;
         }
         mLastX = x;
@@ -172,15 +197,30 @@ public class HoriScrollViewGroup extends ViewGroup {
     }
 
     private void smoothScrollBy(int x, int y) {
-        mScroller.startScroll(getScrollX(), 0, x, 0);
+        mScroller.startScroll(getScrollX(), 0, x, 0, 500);
         invalidate();
     }
 
     @Override
     public void computeScroll() {
         if (mScroller.computeScrollOffset()) {
+            /**
+             * 为什么可以滑动? scrollTo是改变内容的。
+             * 这个时候我们外面是HoriScrollViewGroup控件，是一个继承了ViewGroup的控件。它的内容就是
+             * 里边所有的子view，包括我们自定义的cusmized_layout以及cusmized_layout的子view。
+             * 所以出现滑动效果。类似于，一个button，直接button.scrollTo()无法实现button的位置滑动，
+             * 但是将button添加进ViewGroup，调用viewGroup.scrollTo()就可以实现button的滑动。
+             * 这时候button就是ViewGroup的内容了。
+             * */
+            //
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
             postInvalidate();
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        mVelocityTracker.recycle();
+        super.onDetachedFromWindow();
     }
 }

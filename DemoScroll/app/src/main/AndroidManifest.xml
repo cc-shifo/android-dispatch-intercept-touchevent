@@ -23,7 +23,8 @@
         <activity android:name=".PropertyAnimatorScrollActivity" />
         <activity android:name=".ViewAnimatorActivity" />
         <activity android:name=".ViewAnimatorScrollActivity" />
-        <activity android:name=".DelayedScrollActivity"></activity>
+        <activity android:name=".DelayedScrollActivity" />
+        <activity android:name=".ScrollToActivity"></activity>
     </application>
 
 </manifest>

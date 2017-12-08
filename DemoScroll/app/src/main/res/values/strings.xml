@@ -6,4 +6,9 @@
     <string name="delayed_scroll">Delayed scroll</string>
     <string name="customized_btn">我可以滑动</string>
 
+    <string name="property_animator_scrollTo">ScrollTo</string>
+    <string name="property_value_animator_scroll">valueAnimator</string>
+    <string name="property_object_animator_scroll">object_animator</string>
+
+
 </resources>

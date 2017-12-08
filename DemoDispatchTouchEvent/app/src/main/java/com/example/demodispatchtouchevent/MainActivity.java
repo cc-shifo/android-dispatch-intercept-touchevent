@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+//import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,19 +12,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //initView();
     }
 
-    private Button btnInterceptInner;
+    /*private Button btnInterceptInner;
     private Button btnInterceptOutter;
     private void initView() {
         btnInterceptInner = (Button)findViewById(R.id.btn_horizontal_1);
         btnInterceptOutter = (Button) findViewById(R.id.btn_horizontal_2);
-    }
+    }*/
 
     public void btnOnClick(View v) {
-        Intent intent = null;
+        Intent intent;
         switch (v.getId()) {
             case R.id.btn_horizontal_1:
+                intent = new Intent(MainActivity.this, InnerInterceptedActivity.class);
+                startActivity(intent);
                 break;
             case R.id.btn_horizontal_2:
                 break;
