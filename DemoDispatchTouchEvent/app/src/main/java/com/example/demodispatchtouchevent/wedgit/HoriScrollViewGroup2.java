@@ -10,11 +10,12 @@ import android.view.ViewGroup;
 import android.widget.Scroller;
 
 /**
- * Created by Administrator on 17-12-7.
+ * Created by Administrator on 17-12-8.
+ * 内部拦截
  */
 
-public class HoriScrollViewGroup extends ViewGroup {
-    private static final String TAG = "HoriScrollViewGroup";
+public class HoriScrollViewGroup2 extends ViewGroup {
+    private static final String TAG = "MyListView1";
     private Scroller mScroller;
     private VelocityTracker mVelocityTracker;
 
@@ -25,17 +26,17 @@ public class HoriScrollViewGroup extends ViewGroup {
     /* 页面宽度 */
     private int mChildWidth;
 
-    public HoriScrollViewGroup(Context context) {
+    public HoriScrollViewGroup2(Context context) {
         super(context);
         initView();
     }
 
-    public HoriScrollViewGroup(Context context, AttributeSet attrs) {
+    public HoriScrollViewGroup2(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView();
     }
 
-    public HoriScrollViewGroup(Context context, AttributeSet attrs, int defStyle) {
+    public HoriScrollViewGroup2(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initView();
     }
@@ -102,15 +103,37 @@ public class HoriScrollViewGroup extends ViewGroup {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         boolean intercepted = false;
-        int x = (int)ev.getX();
-        int y = (int)ev.getY();
-
-        // 增加滑动效果，防止正在滑动的过程中遇到ACTION_DOWN事件造成的停顿。
+        //int x = (int)ev.getX();
+        //int y = (int)ev.getY();
+        Log.d(TAG, "onInterceptTouchEvent: " + ev.getAction());
         if (!mScroller.isFinished()) {
             mScroller.abortAnimation();
         }
 
-        switch (ev.getAction()) {
+        if (ev.getAction() != MotionEvent.ACTION_DOWN) {
+            intercepted = true;
+            // 如果返回true, 事件将从子视图被偷送给ViewGroup，并且当前目标(最终接收ACTION_DOWN的视图
+            // )会收到ACTION_CANCLE=3的事件，当前当前目标不再接受接下来的事件。
+            // 来源于onInterceptTouchEvent()注释。
+            /**
+             * 所以，我们可以看到，当横着滑动的ACTION_MOVE走到MyListView.java
+             * 的dispatchTouchEvent()后，MyListView.java请求了不屏蔽拦截，等于说接下来的ACTION要
+             * 是进入HoriScrollViewGroup2时会有询问拦截这个动作，即会调用这里的onInterceptTouchEvent()，
+             * 这个时候，发现ACTION不是ACTION_DOWN，就返回true。结果导致之前处理ACTION_DOWN的这个
+             * 目标视图，即MyListView视图会收到一个ACTION_CANCEL事件，并且之后的事件都被传给
+             * MyListView的父视图即HoriScrollViewGroup2处理。
+             * 当再一个ACTION_MOVE传给MyListView视图时，MyListView视图会收到一个ACTION_CANCEL事件
+             *
+             * 如果是一个纵向的滑动的ACTION_MOVE走到MyListView.java，MyListView.java没有请求不屏蔽拦截，
+             * 等于说接下来的ACTION要是进入HoriScrollViewGroup2时，不会调用这里
+             * 的onInterceptTouchEvent()。Intercepted = false
+             * */
+            Log.d(TAG, "onInterceptTouchEvent: " + ev.getAction());
+        }
+
+        // 所有ACTION_DOWN都传递给MyListView处理
+        //if (MotionEvent.ACTION_DOWN)
+        /*switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mLastInterceptedX = 0;
                 mLastInterceptedY = 0;
@@ -134,7 +157,14 @@ public class HoriScrollViewGroup extends ViewGroup {
         Log.d(TAG, "onInterceptTouchEvent: " + ev.getAction() + "intercepted:" + intercepted);
         mLastInterceptedX = x;
         mLastInterceptedY = y;
+        */
         return intercepted;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        Log.d(TAG, "dispatchTouchEvent: " + ev.getAction());
+        return super.dispatchTouchEvent(ev);
     }
 
     @Override
@@ -166,7 +196,7 @@ public class HoriScrollViewGroup extends ViewGroup {
                     //scrollBy(tmp_x, 0);
                 else if (mChildIndex == mChildrenSize - 1 && deltaX < 0)
                     scrollBy(-deltaX, 0);
-                    //scrollBy(tmp_x, 0);
+                //scrollBy(tmp_x, 0);
                 //scrollBy(-deltaX, 0);
                 Log.d(TAG, "onTouchEvent: ACTION_MOVE x, mLastX, deltaX" + x + mLastX + deltaX);
                 break;

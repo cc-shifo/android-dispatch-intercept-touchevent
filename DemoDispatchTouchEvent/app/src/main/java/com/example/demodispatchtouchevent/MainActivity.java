@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case R.id.btn_horizontal_2:
+                intent = new Intent(MainActivity.this, OutterInterceptedActivity.class);
+                startActivity(intent);
                 break;
             default:
                 break;
