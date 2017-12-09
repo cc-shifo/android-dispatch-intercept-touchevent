@@ -33,7 +33,6 @@ public class MyListView extends ListView {
     }
 
     @Override
-
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         Log.d(TAG, "onInterceptTouchEvent: " + ev.getAction());
         return super.onInterceptTouchEvent(ev);
@@ -50,7 +49,6 @@ public class MyListView extends ListView {
             case MotionEvent.ACTION_DOWN:
                 mLastX = 0;
                 mLastY = 0;
-                //requestDisallowInterceptTouchEvent(true);
                 /**
                  * 请求父视图屏蔽拦截，也就是父视图不再拦截。即接着当ACTION_MOVE从
                  * OutterInterceptedActivity到HoriScrollViewGroup2时，ViewGroup.java会
